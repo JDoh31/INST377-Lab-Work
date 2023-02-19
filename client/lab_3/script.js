@@ -28,6 +28,11 @@ function updateSlidePosition() {
 }
 
 function moveToNextSlide() {
+  if(slidePosition == totalSlides) {
+    slidePosition = 0;
+  } else {
+    slidePosition += 1;
+  }
   /*
     add an if statement here that checks
     if you're already at the max number of slides
