@@ -314,5 +314,6 @@ form label {
       flex: 0 1 auto;
       margin: 1rem;
       padding: 1.5rem;
+      align-items: flex-start;
   }
 }
