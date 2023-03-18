@@ -24,20 +24,6 @@ function injectHTML(list) {
     const str = `<li>${item.name}</li>`;
     target.innerHTML += str
   })
-  /*
-  ## JS and HTML Injection
-    There are a bunch of methods to inject text or HTML into a document using JS
-    Mainly, they're considered "unsafe" because they can spoof a page pretty easily
-    But they're useful for starting to understand how websites work
-    the usual ones are element.innerText and element.innerHTML
-    Here's an article on the differences if you want to know more:
-    https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innertext
-
-  ## What to do in this function
-    - Accept a list of restaurant objects
-    - using a .forEach method, inject a list element into your index.html for every element in the list
-    - Display the name of that restaurant and what category of food it is
-*/
 }
 
 function processRestaurants(list) {
@@ -73,45 +59,53 @@ async function mainEvent() {
 
   // the async keyword means we can make API requests
   const form = document.querySelector('.main_form'); // get your main form so you can do JS with it
-  const submit = document.querySelector('button[type="submit"]'); // get a reference to your submit button
+  const filterDataButton = document.querySelector('filter');
+  const loadDataButton = document.querySelector("#data_load");
+  const generateListButton = document.querySelector("#generate")// get a reference to your submit button
   submit.style.display = 'none'; // let your submit button disappear
 
   /*
     Let's get some data from the API - it will take a second or two to load
-    
+    This next line goes to the request for 'GET' in the file at /server/routes/foodServiceRoutes.js
+    It's at about line 27 - go have a look and see what we're retrieving and sending back.
    */
-  const results = await fetch('https://data.princegeorgescountymd.gov/resource/umjn-t2iz.json');
+  const results = await fetch('/api/foodServicesPG');
   const arrayFromJson = await results.json(); // here is where we get the data from our request as JSON
 
   /*
-    Below this comment, we log out a table of all the results:
+    Below this comment, we log out a table of all the results using "dot notation"
+    An alternate notation would be "bracket notation" - arrayFromJson["data"]
+    Dot notation is preferred in JS unless you have a good reason to use brackets
+    The 'data' key, which we set at line 38 in foodServiceRoutes.js, contains all 1,000 records we need
   */
-  console.table(arrayFromJson);
+  console.table(arrayFromJson.data);
 
-  // As a next step, log the first entry from your returned array of data.
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
-  console.log(`replace me with the first entry`);
+  // in your browser console, try expanding this object to see what fields are available to work with
+  // for example: arrayFromJson.data[0].name, etc
+  console.log(arrayFromJson.data[0]);
 
-  // Now write a log using string interpolation - log out the name and category of your first returned entry (index [0]) to the browser console
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors
-  console.log(`replace me with the name and category of the first entry`);
+  // this is called "string interpolation" and is how we build large text blocks with variables
+  console.log(`${arrayFromJson.data[0].name} ${arrayFromJson.data[0].category}`);
 
   // This IF statement ensures we can't do anything if we don't have information yet
-  if (arrayFromJson?.length > 0) { // the question mark in this means "if this is set at all"
+  if (arrayFromJson.data?.length > 0) { // the question mark in this means "if this is set at all"
     submit.style.display = 'block'; // let's turn the submit button back on by setting it to display as a block when we have data available
 
     // And here's an eventListener! It's listening for a "submit" button specifically being clicked
     // this is a synchronous event event, because we already did our async request above, and waited for it to resolve
     form.addEventListener('submit', (submitEvent) => {
-      // Using .preventDefault, stop the page from refreshing when a submit event happens
-      // https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
+      // This is needed to stop our page from changing to a new URL even though it heard a GET request
+      submitEvent.preventDefault();
 
-      // This constant will contain the value of your 15-restaurant collection when it processes
-      const restaurantList = processRestaurants(arrayFromJson);
+      // This constant will have the value of your 15-restaurant collection when it processes
+      const restaurantList = processRestaurants(arrayFromJson.data);
 
       // And this function call will perform the "side effect" of injecting the HTML list for you
       injectHTML(restaurantList);
+
+      // By separating the functions, we open the possibility of regenerating the list
+      // without having to retrieve fresh data every time
+      // We also have access to some form values, so we could filter the list based on name
     });
   }
 }
