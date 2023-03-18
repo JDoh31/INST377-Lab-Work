@@ -4,6 +4,11 @@
   Hook this script to index.html
   by adding `<script src="script.js">` just before your closing `</body>` tag
 */
+function getRandomIntInclusive(min,max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 /*
   ## Utility Functions
@@ -13,6 +18,12 @@
 
 function injectHTML(list) {
   console.log('fired injectHTML');
+  const target = document.querySelector('#restaurant_list');
+  target.innerHTML = '';
+  list.forEach((item) => {
+    const str = `<li>${item.name}</li>`;
+    target.innerHTML += str
+  })
   /*
   ## JS and HTML Injection
     There are a bunch of methods to inject text or HTML into a document using JS
