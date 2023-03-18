@@ -4,11 +4,6 @@
   Hook this script to index.html
   by adding `<script src="script.js">` just before your closing `</body>` tag
 */
-function getRandomIntInclusive(min,max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
 
 /*
   ## Utility Functions
@@ -18,12 +13,20 @@ function getRandomIntInclusive(min,max) {
 
 function injectHTML(list) {
   console.log('fired injectHTML');
-  const target = document.querySelector('#restaurant_list');
-  target.innerHTML = '';
-  list.forEach((item) => {
-    const str = `<li>${item.name}</li>`;
-    target.innerHTML += str
-  })
+  /*
+  ## JS and HTML Injection
+    There are a bunch of methods to inject text or HTML into a document using JS
+    Mainly, they're considered "unsafe" because they can spoof a page pretty easily
+    But they're useful for starting to understand how websites work
+    the usual ones are element.innerText and element.innerHTML
+    Here's an article on the differences if you want to know more:
+    https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innertext
+
+  ## What to do in this function
+    - Accept a list of restaurant objects
+    - using a .forEach method, inject a list element into your index.html for every element in the list
+    - Display the name of that restaurant and what category of food it is
+*/
 }
 
 function processRestaurants(list) {
@@ -59,9 +62,7 @@ async function mainEvent() {
 
   // the async keyword means we can make API requests
   const form = document.querySelector('.main_form'); // get your main form so you can do JS with it
-  const filterDataButton = document.querySelector('filter');
-  const loadDataButton = document.querySelector("#data_load");
-  const generateListButton = document.querySelector("#generate")// get a reference to your submit button
+  const submit = document.querySelector('button[type="submit"]'); // get a reference to your submit button
   submit.style.display = 'none'; // let your submit button disappear
 
   /*
