@@ -1,5 +1,6 @@
 /* CSS instructions for Lab 5 */
 /* Bring in your successful CSS from week 4 */
+<<<<<<< HEAD
 /* In your #map rule, set map to display:none; to temporarily hide your map box */
 
 * {
@@ -323,3 +324,9 @@
         align-items: flex-start;
     }
   }
+=======
+/*
+    Add a flexbox class that will keep two buttons nicely styled next to one another
+    under your HTML form and input field
+ */
+>>>>>>> c9a4a2105b6683a7951852735577deae98041e0b
