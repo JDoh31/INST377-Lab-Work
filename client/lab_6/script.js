@@ -11,6 +11,7 @@
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 */
 
+
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -25,7 +26,7 @@ function injectHTML(list) {
   list.forEach((item) => {
     const str = `<li>${item.name}</li>`;
     target.innerHTML += str
-  });
+  })
 }
 
 function processRestaurants(list) {
@@ -48,59 +49,75 @@ function processRestaurants(list) {
   */
 }
 
-async function mainEvent() {
-  /*
-    ## Main Event
-      Separating your main programming from your side functions will help you organize your thoughts
-      When you're not working in a heavily-commented "learning" file, this also is more legible
-      If you separate your work, when one piece is complete, you can save it and trust it
-  */
+function filterList(list, query) {
+  return list.filter((item) => {
+    const lowerCaseName = item.name.toLowerCase();
+    const lowerCaseQuery = query.toLowerCase();
+    return lowerCaseName.includes(lowerCaseQuery);
+  })
+}
 
-  // the async keyword means we can make API requests
-  const form = document.querySelector('.main_form'); // get your main form so you can do JS with it
-  const submit = document.querySelector('button[type="submit"]'); // get a reference to your submit button
-  submit.style.display = 'none'; // let your submit button disappear
+async function mainEvent() { // the async keyword means we can make API requests
+  const mainForm = document.querySelector('.main_form'); // This class name needs to be set on your form before you can listen for an event on it
+  const filterButton = document.querySelector('.filter_button');
+  // Add a querySelector that targets your filter button here
 
-  /*
-    Let's get some data from the API - it will take a second or two to load
+  let currentList = []; // this is "scoped" to the main event function
+  
+  /* We need to listen to an "event" to have something happen in our page - here we're listening for a "submit" */
+  mainForm.addEventListener('submit', async (submitEvent) => { // async has to be declared on every function that needs to "await" something
     
-   */
-  const results = await fetch('https://data.princegeorgescountymd.gov/resource/umjn-t2iz.json');
-  const arrayFromJson = await results.json(); // here is where we get the data from our request as JSON
-  console.table(arrayFromJson);
-  injectHTML(arrayFromJson);
+    // This prevents your page from becoming a list of 1000 records from the county, even if your form still has an action set on it
+    submitEvent.preventDefault(); 
+    
+    // this is substituting for a "breakpoint" - it prints to the browser to tell us we successfully submitted the form
+    console.log('form submission'); 
 
-  // As a next step, log the first entry from your returned array of data.
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
-  console.log(`replace me with the first entry`);
+    /*
+      ## GET requests and Javascript
+        We would like to send our GET request so we can control what we do with the results
+        Let's get those form results before sending off our GET request using the Fetch API
+    
+      ## Retrieving information from an API
+        The Fetch API is relatively new,
+        and is much more convenient than previous data handling methods.
+        Here we make a basic GET request to the server using the Fetch method to the county
+    */
 
-  // Now write a log using string interpolation - log out the name and category of your first returned entry (index [0]) to the browser console
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors
-  console.log(`replace me with the name and category of the first entry`);
+    // Basic GET request - this replaces the form Action
+    const results = await fetch('https://data.princegeorgescountymd.gov/resource/umjn-t2iz.json');
 
-  // This IF statement ensures we can't do anything if we don't have information yet
-  if (arrayFromJson?.length > 0) { // the question mark in this means "if this is set at all"
-    submit.style.display = 'block'; // let's turn the submit button back on by setting it to display as a block when we have data available
+    // This changes the response from the GET into data we can use - an "object"
+    currentList = await results.json();
+    console.table(currentList); 
+    injectHTML(currentList);
+  });
 
-    // And here's an eventListener! It's listening for a "submit" button specifically being clicked
-    // this is a synchronous event event, because we already did our async request above, and waited for it to resolve
-    form.addEventListener('submit', (submitEvent) => {
-      // Using .preventDefault, stop the page from refreshing when a submit event happens
-      // https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
+filterButton.addEventListener('click', (event) => {
+  console.log('clicked FilterButton');
 
-      // This constant will contain the value of your 15-restaurant collection when it processes
-      const restaurantList = processRestaurants(arrayFromJson);
+  const formData = new FormData(mainForm);
+  const formProps = Object.fromEntries(formData);
 
-      // And this function call will perform the "side effect" of injecting the HTML list for you
-      injectHTML(restaurantList);
-    });
-  }
+  console.log(formProps);
+  const newList = filterList(currentList, formProps.resto);
+
+  console.log(newList);
+})
+  /*
+    Now that you HAVE a list loaded, write an event listener set to your filter button
+    it should use the 'new FormData(target-form)' method to read the contents of your main form
+    and the Object.fromEntries() method to convert that data to an object we can work with
+    When you have the contents of the form, use the placeholder at line 7
+    to write a list filter
+    Fire it here and filter for the word "pizza"
+    you should get approximately 46 results
+  */
 }
 
 /*
-  This last line actually runs first!
-  It's calling the 'mainEvent' function at line 57
-  It runs first because the listener is set to when your HTML content has loaded
+  This adds an event listener that fires our main event only once our page elements have loaded
+  The use of the async keyword means we can "await" events before continuing in our scripts
+  In this case, we load some data when the form has submitted
 */
 document.addEventListener('DOMContentLoaded', async () => mainEvent()); // the async keyword means we can make API requests
