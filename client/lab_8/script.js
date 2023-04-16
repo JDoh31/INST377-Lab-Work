@@ -44,7 +44,12 @@ async function mainEvent() {
   loadAnimation.style.display = "none";
   generateListButton.classList.add("hidden");
 
-  let storedList = [];
+  const storedData = localStorage.getItem('storedData');
+  const parsedData = JSON.parse(storedData);
+  if (parsedData.length > 0) {
+    generateListButton.classList.remove("hidden");
+  }
+
   let currentList = [];
 
   /* We need to listen to an "event" to have something happen in our page - here we're listening for a "submit" */
@@ -59,13 +64,11 @@ async function mainEvent() {
     );
 
     // This changes the response from the GET into data we can use - an "object"
-    storedList = await results.json();
-    if (storedList.length > 0) {
-      generateListButton.classList.remove("hidden");
-    }
+    const storedList = await results.json();
+    localStorage.setItem('storedData', JSON.stringify(storedList));
 
     loadAnimation.style.display = "none";
-    console.table(storedList);
+    // console.table(storedList);
   });
 
   filterButton.addEventListener("click", (event) => {
@@ -82,7 +85,7 @@ async function mainEvent() {
 
   generateListButton.addEventListener("click", (event) => {
     console.log("generate new list");
-    const currentList = processRestaurants(storedList);
+    const currentList = processRestaurants(parsedData);
     console.log(currentList);
     injectHTML(currentList);
   });
