@@ -74,7 +74,7 @@ async function mainEvent() {
 
   const storedData = localStorage.getItem('storedData');
   let parsedData = JSON.parse(storedData);
-  if (parsedData.length > 0) {
+  if (parsedData?.length > 0) {
     generateListButton.classList.remove("hidden");
   }
 
@@ -96,7 +96,7 @@ async function mainEvent() {
     localStorage.setItem('storedData', JSON.stringify(storedList));
     parsedData = storedList;
 
-    if (parsedData.length > 0) {
+    if (parsedData?.length > 0) {
       generateListButton.classList.remove("hidden");
     }
 
